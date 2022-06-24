@@ -35,3 +35,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// war ファイルを構築するタスク
+war {
+    enabled = true
+    archiveName='demo.war' // <- プロジェクトに合わせて書き換える
+}
