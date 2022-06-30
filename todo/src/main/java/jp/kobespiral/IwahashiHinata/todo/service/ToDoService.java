@@ -19,7 +19,8 @@ public class ToDoService {
    @Autowired
    ToDoRepository tRepo;
    /**
-    * メンバーを作成する (C)
+    * ここで登録するのは作成者だけ？
+    * タスクを作成する (C)
     * @param form
     * @return
     */
@@ -27,13 +28,13 @@ public class ToDoService {
        
        ToDo t = form.toEntity();
        t.setMid(mid);
-       t.setDone(false);
-       t.setCreatedAt(new Date());
-       t.setDoneAt(null);
+       //t.setDone(false);              //ToDoformのとこですでに書いてる？
+       //t.setCreatedAt(new Date());    //ToDoformのとこですでに書いてる？
+       //t.setDoneAt(null);             //ToDoformのとこですでに書いてる？
        return tRepo.save(t);
    }
    /**
-    * メンバーを取得する (R)
+    * タスクの通し番号からそのタスクを取得する (R)
     * @param mid
     * @return
     */
@@ -43,29 +44,49 @@ public class ToDoService {
        return t;
    }
    /**
-    * 全メンバーを取得する (R)
+    * ある作成者の未達成タスクを取得する (R)
     * @return
     */
    public List<ToDo> getToDoList(String mid) {
        return tRepo.findByDoneAndMid(false, mid);
    }
 
+   /*
+    * ある作成者の達成済みタスクを取得する
+    */
    public List<ToDo> getDoneList(String mid){
         return tRepo.findByDoneAndMid(true, mid); 
    }
 
+   /**
+    * 全員分の未達成タスクを取得する
+    */
    public List<ToDo> getToDoList(){
         return tRepo.findByDone(false);
    }
 
+   /**
+    * 全員分の達成済みタスクを取得する
+    * @return
+    */
    public List<ToDo> getDoneList(){
         return tRepo.findByDone(true);
    }
    /**
-    * メンバーを削除する (D)
+    * タスクを削除する (D)
     */
    public void deleteToDo(Long seq) {
        ToDo t = getToDo(seq);
        tRepo.delete(t);
    }
+
+   /**
+    * タスクを達成済みにする
+    */
+    public ToDo DoneTodo(ToDo todo){
+        todo.setDone(true);
+        todo.setDoneAt(new Date());;
+
+        return tRepo.save(todo);
+    }
 }

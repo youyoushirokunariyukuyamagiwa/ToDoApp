@@ -11,17 +11,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import aj.org.objectweb.asm.Attribute;
+import jp.kobespiral.IwahashiHinata.todo.dto.LoginForm;
 import jp.kobespiral.IwahashiHinata.todo.dto.ToDoForm;
 import jp.kobespiral.IwahashiHinata.todo.entity.ToDo;
+import jp.kobespiral.IwahashiHinata.todo.service.MemberService;
 import jp.kobespiral.IwahashiHinata.todo.service.ToDoService;
 
 
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/user")
 public class ToDoController {
    @Autowired
    ToDoService tService;
+   @Autowired
+   MemberService mService;
    /**
     * 管理者用・ユーザ登録ページ HTTP-GET /admin/register
     * @param model
@@ -37,15 +42,19 @@ public class ToDoController {
        return "register";
    }
    /**
-    * 管理者用・ユーザ登録確認ページを表示 HTTP-POST /admin/check
+    * ユーザーログインチェック HTTP-POST /user/check
     * @param form
     * @param model
     * @return
     */
    @PostMapping("/check") 
-   String checkToDoForm(@ModelAttribute(name = "ToDoForm") ToDoForm form,  Model model) {
+   String checkToDoForm(@ModelAttribute LoginForm form,  Model model) {
        model.addAttribute("ToDoForm", form);
-       return "check";
+       String mid = form.getMid();
+       //if(mService.checkMember(mid) == false){
+       //     
+       //}
+       return "redirect:/todo/"+mid;
    }
    /**
     * 管理者用・ユーザ登録処理 -> 完了ページ HTTP-POST /admin/register
