@@ -28,55 +28,66 @@ public class ToDoController {
    @Autowired
    MemberService mService;
    /**
-    * 管理者用・ユーザ登録ページ HTTP-GET /admin/register
+    * ユーザーのToDoリスト HTTP-GET /user/mylist
     * @param model
     * @return
     */
-   @GetMapping("/register")
-   String showToDoForm(Model model) {
-       List<ToDo> toDoList = tService.getToDoList();
-       model.addAttribute("ToDoList", toDoList);
-       ToDoForm form = new ToDoForm();
-       model.addAttribute("ToDoForm", form);
+   //@GetMapping("/mylist")
+   String showMyToDoList(Model model,String mid) {
        
-       return "register";
+    model.addAttribute("mid", mid);
+    List<ToDo> toDoList = tService.getToDoList(mid);
+    model.addAttribute("ToDoList", toDoList);
+    List<ToDo> doneList = tService.getDoneList(mid);
+    model.addAttribute("DoneList", doneList);
+    return "list";
    }
    /**
-    * ユーザーログインチェック HTTP-POST /user/check
+    * ユーザーログインチェック HTTP-POST /user/login
     * @param form
     * @param model
     * @return
     */
-   @PostMapping("/check") 
+   @PostMapping("/login") 
    String checkToDoForm(@ModelAttribute LoginForm form,  Model model) {
        model.addAttribute("ToDoForm", form);
        String mid = form.getMid();
-       //if(mService.checkMember(mid) == false){
-       //     
-       //}
-       return "redirect:/todo/"+mid;
+       //ユーザー（mid）が存在するなら
+       if(mService.checkMember(mid)){
+            return showMyToDoList(model, mid);
+       }
+       return "index";//存在しないときはもとのまま？
    }
    /**
-    * 管理者用・ユーザ登録処理 -> 完了ページ HTTP-POST /admin/register
+    * 新規タスク登録 HTTP-POST /user/register
     * @param form
     * @param model
     * @return
     */
    @PostMapping("/register")
-   String createToDo(@ModelAttribute(name = "ToDoForm") ToDoForm form,  Model model ,String mid) {
-       ToDo t =  tService.createToDo(mid, form);
-       model.addAttribute("ToDoForm", t);
-       return "registered";
+   String createToDo(@ModelAttribute ToDoForm form,  Model model ,String mid) {
+       tService.createToDo(mid, form);
+       return showMyToDoList(model, mid);
    }
    /**
-    * 管理者用・ユーザ削除処理　HTTP-GET /admin/delete/{mid}
+    * タスク削除 HTTP-GET /user/delete/{mid}
     * @param mid
     * @param model
     * @return
     */
    @GetMapping("/delete/{mid}")
-   String deleteToDo(@PathVariable Long seq, Model model) {
-       tService.deleteToDo(seq);;
-       return showToDoForm(model);
+   String deleteToDo(@PathVariable Long seq, Model model,String mid) {
+       tService.deleteToDo(seq);
+       return showMyToDoList(model, mid);
    }
+
+   /**
+    * タスク完了
+    */
+    @GetMapping("/done/{mid}")
+    String doneToDo(@PathVariable Long seq, Model model,String mid){
+        tService.DoneTodo(seq);
+        return showMyToDoList(model, mid);
+    }
+
 }

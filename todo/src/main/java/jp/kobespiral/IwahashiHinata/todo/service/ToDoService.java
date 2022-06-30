@@ -83,10 +83,11 @@ public class ToDoService {
    /**
     * タスクを達成済みにする
     */
-    public ToDo DoneTodo(ToDo todo){
-        todo.setDone(true);
-        todo.setDoneAt(new Date());;
+    public ToDo DoneTodo(Long seq){
+        ToDo t = getToDo(seq);
+        t.setDone(true);
+        t.setDoneAt(new Date());;
 
-        return tRepo.save(todo);
+        return tRepo.save(t);
     }
 }

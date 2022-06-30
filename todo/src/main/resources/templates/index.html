@@ -9,7 +9,7 @@
 <body>
     <h2>ログイン</h2>
     <p> メンバーIDを入力してください。</p>
-    <form role="form" th:action="@{/user/check}" th:object="${LoginForm}" method="post">
+    <form role="form" th:action="@{/user/login}" th:object="${LoginForm}" method="post">
         <table>
             <tr>
                 <td><label>メンバーID: </label></td>
