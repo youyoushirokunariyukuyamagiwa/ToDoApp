@@ -4,49 +4,45 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDoAppマイリスト</title>
+    <title>みんなのToDoAppリスト</title>
 </head>
 <body>
-    <h2>マイToDoリスト</h2>
+    <h2>みんなのToDoリスト</h2>
     <table border="1">
         <tr>
             <th>題目</th>
+            <th>作成者</th>
             <th>作成日時</th>
         </tr>
         <tr th:each="t: ${ToDoList}">
             <td>[[${t.title}]]</td>
+            <td>[[${t.mid}]]</td>
             <td>[[${t.createdAt}]]</td>
-            <td><a th:href=@{/user/{t}/delete/{seq}(t=${t.mid},seq=${t.seq})}>削除</a></td>
-            <td><a th:href=@{/user/{t}/done/{seq}(t=${t.mid},seq=${t.seq})}>完了</a></td>
         </tr>
     </table>
-
-    <h3>新規タスク登録</h3>
-    <form role="form" th:action="@{/user/mylist/{mid}/register(mid=${mid})}" th:object="${ToDoForm}" method="post">
-        <table>
-            <tr>
-                <td><label>新規ToDoタイトル: </label></td>
-                <td><input type="text" required th:field="*{title}" /></td>
-            </tr>
-        </table>
-        <p><input type="submit" value="登録" /></p>
-    </form>
     
     <h2>達成済みToDoリスト</h2>
     <table border="1">
         <tr>
             <th>題目</th>
+            <th>作成者</th>
             <th>作成日時</th>
             <th>完了日時</th>
         </tr>
         <tr th:each="d: ${DoneList}">
             <td>[[${d.title}]]</td>
+            <td>[[${d.mid}]]</td>
             <td>[[${d.createdAt}]]</td>
             <td>[[${d.doneAt}]]</td>
-            <td><a th:href=@{/user/{d}/delete/{seq}(d=${d.mid},seq=${d.seq})}>削除</a></td>
         </tr>
     </table>
     
-    <p> <a th:href=@{/user/allList}>みんなのToDo</a></p>
+    <!-- <p>
+        <a th:href=@{/user/mylist/{mid}(mid=${mid})}>自分のToDo</a><br />
+    </p>  -->
+    <p>
+        <a th:href=@{/user/login}>Login画面</a><br />
+    </p>
+    
 </body>
 </html>

@@ -1,5 +1,6 @@
 package jp.kobespiral.IwahashiHinata.todo.controller;
 
+import java.lang.ProcessBuilder.Redirect;
 import java.util.List; 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +33,27 @@ public class ToDoController {
     * @param model
     * @return
     */
-   //@GetMapping("/mylist")
-   String showMyToDoList(Model model,String mid) {
-       
-    model.addAttribute("mid", mid);
+   @GetMapping("/mylist/{mid}")
+   String showMyToDoList(@PathVariable String mid,@ModelAttribute(name="ToDoForm") ToDoForm tform,Model model) {
     List<ToDo> toDoList = tService.getToDoList(mid);
-    model.addAttribute("ToDoList", toDoList);
     List<ToDo> doneList = tService.getDoneList(mid);
+    model.addAttribute("mid", mid);
+    model.addAttribute("ToDoList", toDoList);
     model.addAttribute("DoneList", doneList);
+    model.addAttribute("ToDoForm", tform);
     return "list";
    }
+   
+   /**
+    * 最初
+    * @return
+    */
+    @GetMapping("/login") 
+   String showLoginForm(Model model,@ModelAttribute LoginForm form) {
+        model.addAttribute("LoginForm", new LoginForm());
+       return "index";
+   }
+
    /**
     * ユーザーログインチェック HTTP-POST /user/login
     * @param form
@@ -49,25 +61,27 @@ public class ToDoController {
     * @return
     */
    @PostMapping("/login") 
-   String checkToDoForm(@ModelAttribute LoginForm form,  Model model) {
+   String checkToDoForm(@ModelAttribute(name="LoginForm") LoginForm form,  Model model) {
        model.addAttribute("ToDoForm", form);
        String mid = form.getMid();
        //ユーザー（mid）が存在するなら
        if(mService.checkMember(mid)){
-            return showMyToDoList(model, mid);
+            return "redirect:/user/mylist/"+mid;
        }
+       model.addAttribute("LoginForm", new LoginForm());
        return "index";//存在しないときはもとのまま？
    }
+
    /**
     * 新規タスク登録 HTTP-POST /user/register
     * @param form
     * @param model
     * @return
     */
-   @PostMapping("/register")
-   String createToDo(@ModelAttribute ToDoForm form,  Model model ,String mid) {
+   @PostMapping("/mylist/{mid}/register")
+   String createToDo(@ModelAttribute ToDoForm form,  Model model ,@PathVariable String mid) {
        tService.createToDo(mid, form);
-       return showMyToDoList(model, mid);
+       return "redirect:/user/mylist/"+mid;
    }
    /**
     * タスク削除 HTTP-GET /user/delete/{mid}
@@ -75,19 +89,33 @@ public class ToDoController {
     * @param model
     * @return
     */
-   @GetMapping("/delete/{mid}")
-   String deleteToDo(@PathVariable Long seq, Model model,String mid) {
+   @GetMapping("/{mid}/delete/{seq_str}")
+   String deleteToDo(@PathVariable String seq_str,@PathVariable String mid,Model model) {
+       Long seq = Long.parseLong(seq_str);
        tService.deleteToDo(seq);
-       return showMyToDoList(model, mid);
+       return "redirect:/user/mylist/"+mid;
    }
 
    /**
     * タスク完了
     */
-    @GetMapping("/done/{mid}")
-    String doneToDo(@PathVariable Long seq, Model model,String mid){
+    @GetMapping("/{mid}/done/{seq_str}")
+    String doneToDo(@PathVariable String seq_str, @PathVariable String mid,Model model){
+        Long seq = Long.parseLong(seq_str);
         tService.DoneTodo(seq);
-        return showMyToDoList(model, mid);
+        return "redirect:/user/mylist/"+mid;
     }
 
+    /**
+     * 全員分のToDoリスト
+     */
+    @GetMapping("/allList")
+    String showAllList(@ModelAttribute String mid,Model model){
+        List<ToDo> allToDoList = tService.getToDoList();
+        List<ToDo> allDoneList = tService.getDoneList();
+        model.addAttribute("DoneList", allDoneList);
+        model.addAttribute("ToDoList", allToDoList);
+        model.addAttribute("mid", mid);
+        return "alllist";
+    }
 }
